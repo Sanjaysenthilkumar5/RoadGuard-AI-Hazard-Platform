@@ -1,10 +1,10 @@
-# 🛡️ RoadGuard AI — Intelligent Road Hazard Detection, Mapping & Risk Intelligence Platform
+# RoadGuard AI — Intelligent Road Hazard Detection, Mapping & Risk Intelligence Platform
 
 > **AI-Powered Municipal Pavement Monitoring, Severity Scoring, Geospatial Hotspot Clustering & Field Maintenance Platform**
 
 ---
 
-## 📌 1. Executive Overview
+## 1. Executive Overview
 
 **RoadGuard AI** is an enterprise-grade smart-city road monitoring and risk intelligence system. It transforms standard monocular RGB imagery, video footage, and dashcam camera streams into actionable civil infrastructure intelligence.
 
@@ -49,7 +49,7 @@ Interactive Map       Admin Dashboard       AI Inspector Assistant
 
 ---
 
-## 🚦 2. Key Capabilities & Architecture
+##  2. Key Capabilities & Architecture
 
 ### A. Supported Road Hazard Classes (15 Categories)
 - **Primary Hazards (7)**: Potholes, Speed Breakers / Bumps, Road Surface Cracks, Open Manholes, Road Debris, Waterlogging / Flooding, Damaged Road Surface.
@@ -117,14 +117,14 @@ python -m uvicorn app.main:app --app-dir backend --host 127.0.0.1 --port 8000 --
 ```
 
 Open your browser at:
-👉 **`http://127.0.0.1:8000`**
+ **`http://127.0.0.1:8000`**
 
 Interactive Swagger API Documentation:
-👉 **`http://127.0.0.1:8000/docs`**
+**`http://127.0.0.1:8000/docs`**
 
 ---
 
-## 🧪 5. Testing & Verification
+##  5. Testing & Verification
 
 The test suite includes 12 automated unit and integration tests covering:
 - Deterministic Severity & Risk formulas
@@ -135,7 +135,7 @@ The test suite includes 12 automated unit and integration tests covering:
 
 ---
 
-## 📱 6. Edge AI Deployment Architecture
+## 6. Edge AI Deployment Architecture
 
 For deployment on NVIDIA Jetson Orin Nano, Raspberry Pi 5, or mobile smartphones:
 1. **Model Export**: Export YOLO weights to ONNX with FP16 or INT8 quantization (`yolo export format=onnx int8=True`).
