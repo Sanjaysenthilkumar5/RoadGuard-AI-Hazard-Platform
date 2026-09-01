@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoadGuard AI — Road Hazard Detection & Risk Intelligence Platform</title>
+  <meta name="description" content="AI-powered road hazard detection, computer vision monitoring, severity risk intelligence, and municipal maintenance platform.">
+  
+  <!-- Fonts & Styles -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- Chart.js & Leaflet JS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+<body>
+  <div id="app-root">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo-badge">🛡️</div>
+        <div>
+          <div class="brand-title">ROADGUARD AI</div>
+          <div class="brand-sub">RISK INTELLIGENCE</div>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <div class="nav-category">Overview</div>
+        <a class="nav-item active" data-view="landing" id="nav-landing">
+          <span class="icon">⚡</span> <span>Platform Home</span>
+        </a>
+        <a class="nav-item" data-view="dashboard" id="nav-dashboard">
+          <span class="icon">📊</span> <span>Admin Dashboard</span>
+        </a>
+        <a class="nav-item" data-view="map" id="nav-map">
+          <span class="icon">🗺️</span> <span>Interactive Map</span>
+        </a>
+
+        <div class="nav-category">AI Computer Vision</div>
+        <a class="nav-item" data-view="image" id="nav-image">
+          <span class="icon">🖼️</span> <span>Image Analysis Lab</span>
+        </a>
+        <a class="nav-item" data-view="video" id="nav-video">
+          <span class="icon">🎥</span> <span>Video Studio</span>
+        </a>
+        <a class="nav-item" data-view="camera" id="nav-camera">
+          <span class="icon">📹</span> <span>Real-Time Camera</span>
+        </a>
+
+        <div class="nav-category">Operations & Field</div>
+        <a class="nav-item" data-view="maintenance" id="nav-maintenance">
+          <span class="icon">🔧</span> <span>Maintenance Priority</span>
+        </a>
+        <a class="nav-item" data-view="inspector" id="nav-inspector">
+          <span class="icon">👷</span> <span>Field Inspector</span>
+        </a>
+        <a class="nav-item" data-view="citizen" id="nav-citizen">
+          <span class="icon">📢</span> <span>Citizen Hazard Report</span>
+        </a>
+
+        <div class="nav-category">Intelligence & Model</div>
+        <a class="nav-item" data-view="assistant" id="nav-assistant">
+          <span class="icon">🤖</span> <span>AI Inspector Assistant</span>
+        </a>
+        <a class="nav-item" data-view="report" id="nav-report">
+          <span class="icon">📑</span> <span>Executive Reports</span>
+        </a>
+        <a class="nav-item" data-view="model" id="nav-model">
+          <span class="icon">⚙️</span> <span>Model Evaluation</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-card" id="user-profile-badge">
+          <div class="user-info">
+            <div class="name" id="current-user-name">Elena Vance</div>
+            <div class="role-badge" id="current-user-role">Authority / Admin</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="btn-open-role-modal" title="Switch Demo Role">Switch</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="btn btn-secondary btn-sm" id="btn-toggle-sidebar" style="display:none;">☰</button>
+          <div class="view-title" id="page-heading">Platform Home</div>
+        </div>
+        <div class="topbar-right">
+          <div class="system-status">
+            <div class="status-dot"></div>
+            <span id="active-model-tag">RoadGuard-YOLO-v2.4 (67 FPS)</span>
+          </div>
+          <button class="btn btn-primary btn-sm" id="btn-quick-detect">+ Run Detection</button>
+        </div>
+      </header>
+
+      <!-- CONTENT AREA -->
+      <main class="content-area">
+        
+        <!-- 1. LANDING PAGE VIEW -->
+        <section class="view-container active" id="view-landing">
+          <div class="hero-section" style="padding: 40px 20px; text-align: center; max-width: 900px; margin: 0 auto 40px;">
+            <div class="badge badge-medium" style="margin-bottom: 16px;">AI-POWERED ROAD HAZARD & RISK INTELLIGENCE</div>
+            <h1 style="font-size: 42px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; letter-spacing: -1px;">
+              See the Road Before It Becomes a Risk.
+            </h1>
+            <p style="font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 28px; max-width: 720px; margin-left: auto; margin-right: auto;">
+              RoadGuard AI combines real-time computer vision, multi-frame object tracking, and geospatial intelligence to detect potholes, cracks, manholes, and surface failures—estimating severity and prioritizing municipal maintenance before catastrophic damage occurs.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+              <button class="btn btn-primary btn-lg" onclick="window.router.navigate('image')">Analyze Road Image</button>
+              <button class="btn btn-secondary btn-lg" onclick="window.router.navigate('camera')">Live Camera Stream</button>
+              <button class="btn btn-secondary btn-lg" onclick="window.router.navigate('map')">Explore Hazard Map</button>
+              <button class="btn btn-secondary btn-lg" onclick="window.router.navigate('dashboard')">Admin Dashboard</button>
+            </div>
+          </div>
+
+          <!-- Feature Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px;">
+            <div class="card">
+              <div style="font-size: 28px; margin-bottom: 12px;">🖼️</div>
+              <h3 style="margin-bottom: 8px; font-size: 16px;">Computer Vision Detection</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Classifies 15 road defect categories including potholes, speed bumps, fissures, debris, and waterlogging with sub-pixel bounding box localization.</p>
+            </div>
+            <div class="card">
+              <div style="font-size: 28px; margin-bottom: 12px;">🎯</div>
+              <h3 style="margin-bottom: 8px; font-size: 16px;">Deterministic Risk Engine</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Calculates explainable 0–100 risk ratings combining defect morphology, wheel track trajectory, water presence, and citizen report volume.</p>
+            </div>
+            <div class="card">
+              <div style="font-size: 28px; margin-bottom: 12px;">🎥</div>
+              <h3 style="margin-bottom: 8px; font-size: 16px;">Temporal Video Tracking</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">SORT-based multi-frame IoU tracking prevents duplicate hazard count inflation across consecutive dashcam video frames.</p>
+            </div>
+            <div class="card">
+              <div style="font-size: 28px; margin-bottom: 12px;">🗺️</div>
+              <h3 style="margin-bottom: 8px; font-size: 16px;">Geospatial Hotspots</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Spatial clustering computes road hazard density per kilometer, identifying critical municipal maintenance priority corridors.</p>
+            </div>
+            <div class="card">
+              <div style="font-size: 28px; margin-bottom: 12px;">👷</div>
+              <h3 style="margin-bottom: 8px; font-size: 16px;">Field Repair Lifecycle</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Complete field inspector workflow from dispatch to repair completion with interactive Before/After evidence verification.</p>
+            </div>
+            <div class="card">
+              <div style="font-size: 28px; margin-bottom: 12px;">🤖</div>
+              <h3 style="margin-bottom: 8px; font-size: 16px;">AI Inspector Assistant</h3>
+              <p style="color: var(--text-muted); font-size: 13px;">Natural language query assistant grounded in database tools providing real-time smart-city road condition analytics.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. IMAGE ANALYSIS LAB VIEW -->
+        <section class="view-container" id="view-image">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
+            <!-- Left: Viewer & Controls -->
+            <div>
+              <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                  <div class="card-title"><span>🖼️</span> Road Vision Canvas</div>
+                  <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary btn-sm" id="btn-toggle-depth">Toggle Depth Heatmap</button>
+                    <label class="btn btn-primary btn-sm" style="cursor: pointer;">
+                      Upload Image <input type="file" id="image-upload-input" accept="image/*" style="display:none;">
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Sample Presets -->
+                <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                  <span style="font-size: 12px; color: var(--text-dim); align-self: center;">Test Presets:</span>
+                  <button class="btn btn-secondary btn-sm preset-btn" data-preset="pothole">Pothole</button>
+                  <button class="btn btn-secondary btn-sm preset-btn" data-preset="open_manhole">Open Manhole</button>
+                  <button class="btn btn-secondary btn-sm preset-btn" data-preset="waterlogging">Waterlogging</button>
+                  <button class="btn btn-secondary btn-sm preset-btn" data-preset="road_crack">Road Crack</button>
+                  <button class="btn btn-secondary btn-sm preset-btn" data-preset="speed_breaker">Speed Bump</button>
+                </div>
+
+                <!-- Canvas Viewer Box -->
+                <div class="viewer-box" id="image-viewer-box">
+                  <div class="hud-overlay">
+                    <div class="hud-chip" id="hud-res">RES: 640x400</div>
+                    <div class="hud-chip" id="hud-objects">OBJECTS: 1 DETECTED</div>
+                  </div>
+                  <img id="image-preview" src="/static/assets/sample_pothole.jpg" alt="Analyzed Road" style="max-width: 100%; max-height: 480px; object-fit: contain;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Severity & Risk Engine Results -->
+            <div>
+              <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                  <div class="card-title"><span>⚡</span> Detection & Severity Assessment</div>
+                  <span class="badge badge-critical" id="img-sev-badge">CRITICAL</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                  <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                      <span style="font-size: 12px; color: var(--text-muted);">Hazard Classification</span>
+                      <strong style="font-size: 14px; color: var(--text-main);" id="img-hazard-type">Pothole</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                      <span style="font-size: 12px; color: var(--text-muted);">Model Confidence</span>
+                      <strong style="font-size: 14px; color: var(--accent-cyan);" id="img-confidence">95%</strong>
+                    </div>
+                  </div>
+
+                  <!-- Risk Score Gauge -->
+                  <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+                      <span style="font-size: 12px; text-transform: uppercase; color: var(--text-dim); font-weight: 700;">Vehicle Risk Score</span>
+                      <span style="font-size: 24px; font-weight: 800; font-family: var(--font-mono); color: var(--sev-critical);" id="img-risk-score">88 / 100</span>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden; margin-bottom: 8px;">
+                      <div id="img-risk-bar" style="width: 88%; height: 100%; background: linear-gradient(to right, #38bdf8, #f59e0b, #f43f5e);"></div>
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted);" id="img-risk-reason">
+                      Large pothole depression located directly in vehicle wheel path.
+                    </div>
+                  </div>
+
+                  <!-- Approximate Physical Dimensions -->
+                  <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 8px; border: 1px solid var(--border-subtle);">
+                    <div style="font-size: 11px; text-transform: uppercase; color: var(--text-dim); font-weight: 700; margin-bottom: 8px;">Physical Dimension Estimates</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+                      <div>Estimated Width: <strong id="img-dim-width">68 cm</strong></div>
+                      <div>Estimated Area: <strong id="img-dim-area">3,900 cm²</strong></div>
+                      <div>Relative Area: <strong id="img-dim-pct">7.8%</strong></div>
+                      <div>Relative Depth: <strong id="img-dim-depth">High (0.82)</strong></div>
+                    </div>
+                    <div style="font-size: 10px; color: var(--text-dim); margin-top: 8px; font-style: italic;">
+                      * Monocular perspective geometry approximation (uncalibrated camera).
+                    </div>
+                  </div>
+
+                  <!-- Report Action -->
+                  <button class="btn btn-primary" id="btn-save-image-hazard" style="width: 100%;">
+                    📍 Register & Map Hazard to City System
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. VIDEO STUDIO VIEW -->
+        <section class="view-container" id="view-video">
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+              <div class="card-title"><span>🎥</span> Multi-Frame Temporal Video Tracking Studio</div>
+              <label class="btn btn-primary btn-sm" style="cursor: pointer;">
+                Select Video File <input type="file" id="video-upload-input" accept="video/*" style="display:none;">
+              </label>
+            </div>
+            
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+              Processes road footage using IoU and centroid association tracking. Persistent tracking IDs prevent duplicate counting of identical potholes across consecutive frames.
+            </p>
+
+            <!-- Video Progress Bar -->
+            <div id="video-progress-container" style="display:none; margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                <span id="video-progress-status">Processing frames with YOLO & IoU Tracker...</span>
+                <span id="video-progress-pct" style="font-weight: 700; color: var(--accent-cyan);">65%</span>
+              </div>
+              <div style="width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden;">
+                <div id="video-progress-bar" style="width: 65%; height: 100%; background: linear-gradient(to right, var(--accent-cyan), var(--accent-indigo)); transition: width 0.3s;"></div>
+              </div>
+            </div>
+
+            <!-- Video Stats Strip -->
+            <div class="kpi-grid" style="margin-bottom: 20px;">
+              <div class="kpi-card">
+                <div class="kpi-label">Frames Sampled</div>
+                <div class="kpi-value" id="vid-frames-val">28</div>
+                <div class="kpi-sub">5 FPS sampling rate</div>
+              </div>
+              <div class="kpi-card critical">
+                <div class="kpi-label">Unique Hazards Tracked</div>
+                <div class="kpi-value" id="vid-unique-val">3</div>
+                <div class="kpi-sub">Assigned persistent IDs</div>
+              </div>
+              <div class="kpi-card resolved">
+                <div class="kpi-label">Duplicate Frames Suppressed</div>
+                <div class="kpi-value" id="vid-suppressed-val">7</div>
+                <div class="kpi-sub">Multi-frame inflation prevented</div>
+              </div>
+            </div>
+
+            <!-- Tracked Hazards Table -->
+            <div class="card-title" style="margin-bottom: 12px;">Tracked Object Registry</div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Persistent Track ID</th>
+                    <th>Classification</th>
+                    <th>Peak Confidence</th>
+                    <th>Frame Span</th>
+                    <th>Severity Level</th>
+                    <th>Risk Score</th>
+                  </tr>
+                </thead>
+                <tbody id="video-tracks-tbody">
+                  <tr>
+                    <td><strong>#TRK-01</strong></td>
+                    <td>Pothole</td>
+                    <td>95%</td>
+                    <td>Frames 2 – 5 (4 frames)</td>
+                    <td><span class="badge badge-critical">CRITICAL</span></td>
+                    <td><strong style="color:var(--sev-critical);">84 / 100</strong></td>
+                  </tr>
+                  <tr>
+                    <td><strong>#TRK-02</strong></td>
+                    <td>Road Crack</td>
+                    <td>90%</td>
+                    <td>Frames 12 – 14 (3 frames)</td>
+                    <td><span class="badge badge-medium">MEDIUM</span></td>
+                    <td><strong style="color:var(--sev-medium);">62 / 100</strong></td>
+                  </tr>
+                  <tr>
+                    <td><strong>#TRK-03</strong></td>
+                    <td>Speed Breaker</td>
+                    <td>94%</td>
+                    <td>Frames 20 – 22 (3 frames)</td>
+                    <td><span class="badge badge-high">HIGH</span></td>
+                    <td><strong style="color:var(--sev-high);">68 / 100</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. REAL-TIME CAMERA VIEW -->
+        <section class="view-container" id="view-camera">
+          <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px;">
+            <div>
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><span>📹</span> Live Stream Computer Vision HUD</div>
+                  <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary btn-sm" id="btn-toggle-audio-alert">🔊 Audio Alert: ON</button>
+                    <button class="btn btn-primary btn-sm" id="btn-start-camera">Start Live Detection</button>
+                  </div>
+                </div>
+
+                <!-- Video HUD Container -->
+                <div class="viewer-box" style="position: relative; background: #000; min-height: 420px;">
+                  <div class="radar-scanline"></div>
+                  <div class="hud-overlay">
+                    <div class="hud-chip" id="cam-fps">FPS: 24.5</div>
+                    <div class="hud-chip" id="cam-gps">GPS: 37.7749° N, 122.4194° W</div>
+                    <div class="hud-chip" id="cam-hazards-count">HAZARDS: 1</div>
+                  </div>
+
+                  <!-- Safety Alert Toast within HUD -->
+                  <div id="cam-alert-box" style="display:none; position: absolute; bottom: 16px; left: 16px; right: 16px; background: rgba(244, 63, 94, 0.95); padding: 10px 16px; border-radius: 8px; color: #fff; font-weight: 700; text-align: center; z-index: 30; animation: pulse-dot 1s infinite;">
+                    ⚠️ CRITICAL HAZARD DETECTED: Large Pothole Ahead! Reduce Speed.
+                  </div>
+
+                  <video id="webcam-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover; display:none;"></video>
+                  <canvas id="camera-overlay-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index: 5;"></canvas>
+                  <img id="camera-fallback-frame" src="/static/assets/sample_pothole.jpg" alt="Simulated Road Feed" style="max-width: 100%; height: auto;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Real-time telemetry -->
+            <div>
+              <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                  <div class="card-title"><span>📡</span> Real-Time Telemetry & Controls</div>
+                  <span class="badge badge-low" id="cam-status-badge">MONITORING</span>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap: 16px;">
+                  <div>
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 6px;">
+                      Confidence Threshold Filter: <strong id="cam-conf-val" style="color: var(--accent-cyan);">0.50</strong>
+                    </label>
+                    <input type="range" id="cam-conf-slider" min="0.30" max="0.95" step="0.05" value="0.50" style="width: 100%;">
+                  </div>
+
+                  <div class="kpi-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+                    <div class="kpi-card">
+                      <div class="kpi-label">Inference Time</div>
+                      <div class="kpi-value" style="font-size: 20px;" id="cam-latency-val">14.8 ms</div>
+                    </div>
+                    <div class="kpi-card critical">
+                      <div class="kpi-label">Max Risk Score</div>
+                      <div class="kpi-value" style="font-size: 20px;" id="cam-peak-risk">88 / 100</div>
+                    </div>
+                  </div>
+
+                  <button class="btn btn-primary" id="btn-snapshot-hazard">
+                    📸 Capture & Register Incident
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. INTERACTIVE MAP VIEW -->
+        <section class="view-container" id="view-map">
+          <div class="card" style="padding: 14px; margin-bottom: 16px;">
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <span style="font-size: 12px; font-weight: 700; color: var(--text-dim);">FILTERS:</span>
+                <select id="map-filter-severity" class="btn btn-secondary btn-sm" style="background:var(--bg-secondary);">
+                  <option value="">All Severities</option>
+                  <option value="CRITICAL">Critical Only</option>
+                  <option value="HIGH">High Only</option>
+                  <option value="MEDIUM">Medium Only</option>
+                  <option value="LOW">Low Only</option>
+                </select>
+
+                <select id="map-filter-type" class="btn btn-secondary btn-sm" style="background:var(--bg-secondary);">
+                  <option value="">All Hazard Types</option>
+                  <option value="pothole">Potholes</option>
+                  <option value="open_manhole">Open Manholes</option>
+                  <option value="waterlogging">Waterlogging</option>
+                  <option value="road_crack">Road Cracks</option>
+                  <option value="speed_breaker">Speed Breakers</option>
+                  <option value="damaged_surface">Damaged Surface</option>
+                </select>
+
+                <label style="font-size: 12px; color: var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" id="map-filter-unresolved" checked> Unresolved Only
+                </label>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" id="btn-toggle-hotspots">🔥 Toggle Hotspot Heatmaps</button>
+                <button class="btn btn-secondary btn-sm" id="btn-refresh-map">🔄 Refresh Map</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leaflet Map Container -->
+          <div id="leaflet-map" style="width: 100%; height: 600px; border-radius: 12px; border: 1px solid var(--border-subtle); z-index: 1;"></div>
+        </section>
+
+        <!-- 6. ADMIN DASHBOARD VIEW -->
+        <section class="view-container" id="view-dashboard">
+          <!-- KPI Cards -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-label">Total Hazards Detected</div>
+              <div class="kpi-value" id="kpi-total">1,284</div>
+              <div class="kpi-sub">Across 4 monitored districts</div>
+            </div>
+            <div class="kpi-card critical">
+              <div class="kpi-label">Critical Safety Risks</div>
+              <div class="kpi-value" style="color:var(--sev-critical);" id="kpi-critical">143</div>
+              <div class="kpi-sub">Requires 24hr response</div>
+            </div>
+            <div class="kpi-card high">
+              <div class="kpi-label">Unresolved in Queue</div>
+              <div class="kpi-value" style="color:var(--sev-high);" id="kpi-unresolved">600</div>
+              <div class="kpi-sub">Awaiting repair completion</div>
+            </div>
+            <div class="kpi-card resolved">
+              <div class="kpi-label">Repaired & Verified</div>
+              <div class="kpi-value" style="color:var(--sev-low);" id="kpi-resolved">684</div>
+              <div class="kpi-sub">53.3% Resolution Velocity</div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Active Hotspots</div>
+              <div class="kpi-value" id="kpi-hotspots">4</div>
+              <div class="kpi-sub">High defect concentration</div>
+            </div>
+          </div>
+
+          <!-- Charts Row 1 -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span>📊</span> Hazards by Classification</div>
+              </div>
+              <div style="height: 260px;">
+                <canvas id="chart-hazard-types"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span>🍩</span> Severity Distribution</div>
+              </div>
+              <div style="height: 260px;">
+                <canvas id="chart-severity"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row 2 -->
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px;">
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span>📈</span> Weekly Incident & Resolution Velocity</div>
+              </div>
+              <div style="height: 260px;">
+                <canvas id="chart-trend"></canvas>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span>🏆</span> Critical Arterial Risk Ranking</div>
+              </div>
+              <div style="height: 260px;">
+                <canvas id="chart-area-risk"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. MAINTENANCE PRIORITY QUEUE -->
+        <section class="view-container" id="view-maintenance">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><span>🔧</span> Deterministic Maintenance Priority Ranking</div>
+              <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary btn-sm" onclick="window.api.exportCSV()">Export CSV</button>
+                <button class="btn btn-secondary btn-sm" onclick="window.api.exportJSON()">Export JSON</button>
+              </div>
+            </div>
+            
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+              Ranking algorithm dynamically weights Risk Score (40%), Severity Tier (25%), Citizen Recurrence (15%), Days Open (10%), and Class Urgency (10%).
+            </p>
+
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Hazard ID</th>
+                    <th>Classification</th>
+                    <th>Severity</th>
+                    <th>Risk Score</th>
+                    <th>Priority Rating</th>
+                    <th>Location / Road</th>
+                    <th>Citizen Reports</th>
+                    <th>Assigned Inspector</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="maintenance-queue-tbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. FIELD INSPECTOR PORTAL -->
+        <section class="view-container" id="view-inspector">
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+              <div class="card-title"><span>👷</span> Field Inspector Task Dispatch</div>
+              <span class="badge badge-high">Marcus Stone (#INSP-0042)</span>
+            </div>
+            
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Task ID</th>
+                    <th>Hazard</th>
+                    <th>Severity</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="inspector-tasks-tbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9. CITIZEN HAZARD REPORT -->
+        <section class="view-container" id="view-citizen">
+          <div class="card" style="max-width: 680px; margin: 0 auto;">
+            <div class="card-header">
+              <div class="card-title"><span>📢</span> Submit Citizen Road Hazard Report</div>
+            </div>
+
+            <form id="citizen-report-form" style="display: flex; flex-direction: column; gap: 16px;">
+              <div>
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-dim); display: block; margin-bottom: 6px;">
+                  1. Road Defect Photo
+                </label>
+                <input type="file" id="citizen-file-input" accept="image/*" class="btn btn-secondary" style="width: 100%;">
+              </div>
+
+              <div>
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-dim); display: block; margin-bottom: 6px;">
+                  2. Hazard Type
+                </label>
+                <select id="citizen-type-select" class="btn btn-secondary" style="width: 100%; background: var(--bg-secondary);">
+                  <option value="pothole">Pothole</option>
+                  <option value="open_manhole">Open Manhole</option>
+                  <option value="road_crack">Road Surface Crack</option>
+                  <option value="waterlogging">Waterlogging / Flooding</option>
+                  <option value="speed_breaker">Unmarked Speed Breaker</option>
+                  <option value="damaged_surface">Damaged Surface / Pavement Failure</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-dim); display: block; margin-bottom: 6px;">
+                  3. GPS Coordinates
+                </label>
+                <div style="display: flex; gap: 10px;">
+                  <input type="text" id="citizen-gps-input" value="37.7749, -122.4194" class="btn btn-secondary" style="flex: 1; text-align: left;" readonly>
+                  <button type="button" class="btn btn-secondary" id="btn-citizen-geolocate">📍 Get Current GPS</button>
+                </div>
+              </div>
+
+              <div>
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-dim); display: block; margin-bottom: 6px;">
+                  4. Description / Street Landmark
+                </label>
+                <textarea id="citizen-desc-input" rows="3" class="btn btn-secondary" style="width: 100%; text-align: left; resize: vertical;" placeholder="e.g. Deep pothole near crosswalk on Market St."></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-lg" style="margin-top: 10px;">
+                🚀 Submit Hazard Report with AI Verification
+              </button>
+            </form>
+          </div>
+        </section>
+
+        <!-- 10. AI INSPECTOR ASSISTANT -->
+        <section class="view-container" id="view-assistant">
+          <div class="card" style="max-width: 800px; margin: 0 auto; min-height: 520px; display: flex; flex-direction: column;">
+            <div class="card-header">
+              <div class="card-title"><span>🤖</span> AI Road Inspector Assistant</div>
+              <span class="badge badge-low">Database Grounded</span>
+            </div>
+
+            <!-- Predefined Prompt Chips -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+              <button class="btn btn-secondary btn-sm assistant-chip">Show critical hazards</button>
+              <button class="btn btn-secondary btn-sm assistant-chip">Which road needs attention first?</button>
+              <button class="btn btn-secondary btn-sm assistant-chip">Summarize active hotspots</button>
+              <button class="btn btn-secondary btn-sm assistant-chip">How many unresolved hazards exist?</button>
+            </div>
+
+            <!-- Chat History Area -->
+            <div id="assistant-chat-history" style="flex: 1; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border-subtle); padding: 16px; overflow-y: auto; max-height: 380px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
+              <div style="background: rgba(30, 41, 59, 0.6); padding: 12px 16px; border-radius: 8px; border-left: 3px solid var(--accent-cyan); font-size: 13px;">
+                Hello! I am your <strong>RoadGuard AI Inspector Assistant</strong>. Ask me about citywide road conditions, critical potholes, repair priorities, or hotspot clusters. Every response is backed by database tool calculations.
+              </div>
+            </div>
+
+            <!-- Input Box -->
+            <form id="assistant-form" style="display: flex; gap: 10px;">
+              <input type="text" id="assistant-input" placeholder="Ask about road defects, hotspots, or repair priorities..." class="btn btn-secondary" style="flex: 1; text-align: left;">
+              <button type="submit" class="btn btn-primary">Send Query</button>
+            </form>
+          </div>
+        </section>
+
+        <!-- 11. EXECUTIVE REPORT GENERATOR -->
+        <section class="view-container" id="view-report">
+          <div class="card" style="max-width: 850px; margin: 0 auto;">
+            <div class="card-header">
+              <div class="card-title"><span>📑</span> Smart City Executive Road Condition Report</div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-sm" onclick="window.open('/api/v1/export/print-report', '_blank')">🖨️ Printable HTML / PDF</button>
+                <button class="btn btn-primary btn-sm" id="btn-generate-report">🔄 Regenerate Report</button>
+              </div>
+            </div>
+
+            <div id="report-content-box" style="padding: 10px 0;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- 12. MODEL EVALUATION PANEL -->
+        <section class="view-container" id="view-model">
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header">
+              <div class="card-title"><span>⚙️</span> Computer Vision Model Architecture & Benchmarks</div>
+              <span class="badge badge-low">v2.4 Active</span>
+            </div>
+
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-label">mAP@50 Metric</div>
+                <div class="kpi-value" style="color: var(--accent-cyan);">92.4%</div>
+                <div class="kpi-sub">mAP@50:95 = 76.8%</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Precision</div>
+                <div class="kpi-value">92.8%</div>
+                <div class="kpi-sub">Low false positive rate</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Recall</div>
+                <div class="kpi-value">90.4%</div>
+                <div class="kpi-sub">High detection sensitivity</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-label">Inference Latency</div>
+                <div class="kpi-value">14.8 ms</div>
+                <div class="kpi-sub">67.5 FPS TensorRT</div>
+              </div>
+            </div>
+
+            <!-- Per Class Benchmarks -->
+            <div class="card-title" style="margin: 20px 0 12px;">Per-Class Evaluation Benchmarks</div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Class</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1 Score</th>
+                    <th>Benchmark Samples</th>
+                  </tr>
+                </thead>
+                <tbody id="model-benchmark-tbody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ROLE SWITCHER MODAL -->
+  <div class="modal-backdrop" id="role-modal">
+    <div class="modal-box">
+      <div class="card-header">
+        <div class="card-title">Switch Active Role (Demo Mode)</div>
+        <button class="btn btn-secondary btn-sm" id="btn-close-role-modal">✕</button>
+      </div>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">
+        Select an operational persona to experience role-specific access permissions and workflows:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="card" style="cursor: pointer;" onclick="window.auth.switchRole('ADMIN')">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: var(--accent-cyan);">Authority / Admin</strong>
+              <div style="font-size: 12px; color: var(--text-muted);">Full citywide map, KPI dashboard, maintenance prioritization, reports, model evaluation.</div>
+            </div>
+            <span class="badge badge-high">Elena Vance</span>
+          </div>
+        </div>
+
+        <div class="card" style="cursor: pointer;" onclick="window.auth.switchRole('INSPECTOR')">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: #a5b4fc;">Field Inspector</strong>
+              <div style="font-size: 12px; color: var(--text-muted);">Assigned repair queue, GPS navigation, before/after repair evidence submission.</div>
+            </div>
+            <span class="badge badge-medium">Marcus Stone</span>
+          </div>
+        </div>
+
+        <div class="card" style="cursor: pointer;" onclick="window.auth.switchRole('PUBLIC')">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: var(--sev-low);">Public Citizen</strong>
+              <div style="font-size: 12px; color: var(--text-muted);">Hazard reporting with image upload, instant AI detection preview, nearby alerts.</div>
+            </div>
+            <span class="badge badge-low">Alex Rivera</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEFORE/AFTER REPAIR COMPARISON MODAL -->
+  <div class="modal-backdrop" id="comparison-modal">
+    <div class="modal-box">
+      <div class="card-header">
+        <div class="card-title"><span>🔍</span> Before / After Repair Verification</div>
+        <button class="btn btn-secondary btn-sm" id="btn-close-comp-modal">✕</button>
+      </div>
+
+      <div class="comparison-slider-container" id="comp-slider">
+        <img class="comparison-image" id="comp-img-before" src="/static/assets/sample_pothole.jpg" alt="Before">
+        <div class="comparison-overlay-image" id="comp-overlay">
+          <img id="comp-img-after" src="/static/assets/sample_repaired_road.jpg" alt="After">
+        </div>
+        <div class="comparison-handle" id="comp-handle" style="left: 50%;"></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); margin-top: 10px;">
+        <span>👈 Drag to inspect Before (Damaged)</span>
+        <span>Drag to inspect After (Repaired) 👉</span>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 8px; margin-top: 14px; font-size: 13px;">
+        <div><strong>Repair Evidence Log:</strong> Surface patched with hot-mix asphalt Type 3 and vibratory compacted.</div>
+        <div style="margin-top: 4px; color: var(--text-muted);">Verified by Chief City Engineer Elena Vance.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- JAVASCRIPT CONTROLLERS -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
